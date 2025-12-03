@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Agenda de Salas</title>
+
+<style>
+/* -------- GERAL -------- */
+
+body{
+    margin:0;
+    font-family:Arial;
+    background:#eef1f5;
+    color:#000;
+}
+
+/* HEADER */
+header{
+    background:#003366;
+    color:#fff;
+    padding:18px 20px;
+    display:flex;
+    align-items:center;
+    gap:15px;
+    box-shadow:0 2px 6px rgba(0,0,0,.25);
+}
+.menu-btn{
+    font-size:26px;
+    cursor:pointer;
+    padding:5px 8px;
+    border-radius:6px;
+}
+.menu-btn:hover{
+    background:rgba(255,255,255,.15);
+}
+
+/* -------- SIDEBAR -------- */
+#sidebar{
+    position:fixed;
+    top:0;
+    left:-260px;
+    width:260px;
+    height:100%;
+    background:#003366;
+    padding-top:50px;
+    transition:.3s;
+    box-shadow:2px 0 8px rgba(0,0,0,.35);
+}
+#sidebar a{
+    display:block;
+    padding:15px 20px;
+    font-size:17px;
+    color:#fff;
+    text-decoration:none;
+}
+#sidebar a:hover{
+    background:#00264d;
+    border-left:4px solid #fff;
+}
+
+/* -------- BOXES -------- */
+.box{
+    max-width:700px;
+    margin:25px auto;
+    background:#fff;
+    padding:22px;
+    border-radius:10px;
+    box-shadow:0 3px 12px rgba(0,0,0,.15);
+}
+.box h3{
+    margin:0;
+    padding-left:10px;
+    font-size:22px;
+}
+
+/* Inputs Geral */
+label{display:block;margin-top:12px;font-weight:bold;}
+input,select,textarea,button{
+    width:100%;
+    padding:10px;
+    margin-top:6px;
+    border:1px solid #ccc;
+    border-radius:6px;
+    box-sizing: border-box;
+}
+
+}
+input:focus,select:focus,textarea:focus{
+    border-color:#003366;
+    outline:none;
+    box-shadow:0 0 5px rgba(0,51,102,.35);
+}
+button{
+    background:#003366;
+    color:#fff;
+    cursor:pointer;
+    font-weight:bold;
+}
+button:hover{background:#00264d;}
+
+/* Item lista */
+.item{
+    background:#e8eefc;
+    padding:12px;
+    border-left:4px solid #003366;
+    margin-top:12px;
+    border-radius:6px;
+    box-shadow:0 2px 6px rgba(0,0,0,.1);
+}
+.item button{
+    width:auto;
+    padding:6px 12px;
+    margin:4px 4px 0 0;
+    border-radius:5px;
+}
+.item button:last-child{background:#aa0000;}
+.item button:last-child:hover{background:#800000;}
+.item button:hover{transform:scale(1.05);}
+
+/* -------- CELULAR -------- */
+@media (max-width:600px){
+    header{padding:14px 16px;gap:10px;}
+    #sidebar{width:100%;left:-100%;padding-top:60px;}
+    #sidebar a{font-size:18px;padding:18px 22px;}
+    .box{width:92%;margin:18px auto;padding:18px;}
+    .box h3{font-size:20px;}
+    input,select,textarea,button{padding:12px;font-size:16px;}
+    .item{font-size:15px;padding:10px;}
+    .item button{font-size:14px;padding:6px 10px;}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <span class="menu-btn" onclick="toggleMenu()">☰</span>
+    <h2>Agenda de Salas</h2>
+</header>
+
+<!-- SIDEBAR -->
+<div id="sidebar">
+    <a onclick="trocar('login'); toggleMenu()">Login</a>
+    <a onclick="trocar('cadastro'); toggleMenu()">Cadastro</a>
+    <a onclick="trocar('agenda'); toggleMenu()">Agenda</a>
+    <a onclick="trocar('config'); toggleMenu()">Configurações</a>
+    <a onclick="trocar('sobre'); toggleMenu()">Sobre</a>
+</div>
+
+<!-- LOGIN -->
+<div class="box" id="login">
+    <h3>Login</h3>
+    <form onsubmit="fazerLogin(event)">
+        <label>Email<input id="login_email" type="email"></label>
+        <label>Senha<input id="login_senha" type="password"></label>
+        <button>Entrar</button>
+    </form>
+    <button style="width:auto;margin-top:10px" onclick="trocar('cadastro')">Não tem conta? Cadastre-se</button>
+</div>
+
+<!-- CADASTRO -->
+<div class="box" id="cadastro" style="display:none">
+    <h3>Criar Conta</h3>
+    <form onsubmit="fazerCadastro(event)">
+        <label>Nome<input id="c_nome"></label>
+        <label>Email<input id="c_email" type="email"></label>
+        <label>Senha<input id="c_senha" type="password"></label>
+        <button>Cadastrar</button>
+    </form>
+    <button style="width:auto;margin-top:10px" onclick="trocar('login')">Já tem conta? Login</button>
+</div>
+
+<!-- AGENDA -->
+<div class="box" id="agenda" style="display:none">
+    <h3>Nova Reserva</h3>
+    <form onsubmit="salvarReserva(event)">
+        <input type="hidden" id="r_index">
+
+        <label>Nome<input id="r_nome"></label>
+        <label>Email<input id="r_email" type="email"></label>
+        <label>Data<input id="r_data" type="date" min="2025-01-01" max="2140-12-31"></label>
+        <label>Hora<input id="r_hora" type="time"></label>
+
+        <label>Sala
+            <select id="r_sala">
+                <option value="">Escolha...</option>
+                <option>Sala 1</option><option>Sala 2</option><option>Sala 3</option>
+            </select>
+        </label>
+
+        <label>Descrição<textarea id="r_desc"></textarea></label>
+        <button>Salvar Reserva</button>
+    </form>
+
+    <h3>Reservas Feitas</h3>
+    <div id="lista_res"></div>
+</div>
+
+<!-- CONFIG -->
+<div class="box" id="config" style="display:none">
+    <h3>Configurações</h3>
+    <label>Tema
+        <select onchange="mudarTema(this.value)">
+            <option value="claro">Claro</option>
+            <option value="escuro">Escuro</option>
+        </select>
+    </label>
+    <label>Mostrar notificações<input type="checkbox" checked></label>
+    <button onclick="alert('Configurações salvas!')">Salvar Configurações</button>
+</div>
+
+<!-- SOBRE -->
+<div class="box" id="sobre" style="display:none">
+    <h3>Sobre</h3>
+    <p>Sistema simples de reservas de salas corporativas.</p>
+    <p>Versão: 1.0.0</p>
+    <p>Desenvolvedor: Seu Nome</p>
+</div>
+
+<script>
+/* MENU */
+function toggleMenu(){
+    const s = sidebar;
+    s.style.left = s.style.left==="0px" ? "-260px" : "0px";
+}
+document.addEventListener("click", e=>{
+    if(sidebar.style.left!=="0px") return;
+    if(e.target.closest(".menu-btn") || e.target.closest("#sidebar")) return;
+    sidebar.style.left="-260px";
+});
+
+/* TROCA PÁGINAS */
+function trocar(p){
+    document.querySelectorAll(".box").forEach(b=>b.style.display="none");
+    document.getElementById(p).style.display="block";
+}
+
+/* LOGIN */
+function fazerLogin(e){
+    e.preventDefault();
+    if(!login_email.value || !login_senha.value) return alert("Preencha tudo!");
+    if(!login_email.value.includes("@")) return alert("Email inválido!");
+    alert("Login realizado!");
+    trocar("agenda");
+}
+
+/* CADASTRO */
+function fazerCadastro(e){
+    e.preventDefault();
+    if(!c_nome.value || !c_email.value || !c_senha.value) return alert("Preencha tudo!");
+    if(!c_email.value.includes("@")) return alert("Email inválido!");
+    alert("Cadastro realizado!");
+    trocar("login");
+}
+
+/* RESERVAS */
+function salvarReserva(e){
+    e.preventDefault();
+
+    if(!r_nome.value||!r_email.value||!r_data.value||!r_hora.value||!r_sala.value||!r_desc.value)
+        return alert("Preencha tudo!");
+
+    const ano = +r_data.value.split("-")[0];
+    if(ano<2025 || ano>2140) return alert("Ano deve ser entre 2025 e 2140.");
+
+    let lista = JSON.parse(localStorage.reservas||"[]");
+    const i = r_index.value;
+
+    const item = {
+        nome:r_nome.value,
+        email:r_email.value,
+        data:r_data.value,
+        hora:r_hora.value,
+        sala:r_sala.value,
+        desc:r_desc.value
+    };
+
+    i==="" ? lista.push(item) : lista[i]=item;
+
+    localStorage.reservas = JSON.stringify(lista);
+    alert(i===""?"Reserva salva!":"Reserva atualizada!");
+
+    e.target.reset();
+    r_index.value="";
+    carregar();
+}
+
+function carregar(){
+    let lista = JSON.parse(localStorage.reservas||"[]");
+    lista_res.innerHTML = !lista.length
+        ? "<p>Nenhuma reserva.</p>"
+        : lista.map((r,i)=>`
+            <div class="item">
+                <b>${r.sala}</b><br>
+                ${r.data} ${r.hora}<br>
+                <b>${r.nome}</b> - ${r.email}<br>
+                ${r.desc}<br><br>
+                <button onclick="editarReserva(${i})">Editar</button>
+                <button onclick="excluirReserva(${i})">Excluir</button>
+            </div>`).join("");
+}
+
+function editarReserva(i){
+    const r = JSON.parse(localStorage.reservas)[i];
+    r_nome.value=r.nome;
+    r_email.value=r.email;
+    r_data.value=r.data;
+    r_hora.value=r.hora;
+    r_sala.value=r.sala;
+    r_desc.value=r.desc;
+    r_index.value=i;
+    trocar("agenda");
+}
+
+function excluirReserva(i){
+    if(!confirm("Excluir reserva?")) return;
+    let lista = JSON.parse(localStorage.reservas||"[]");
+    lista.splice(i,1);
+    localStorage.reservas = JSON.stringify(lista);
+    carregar();
+}
+
+/* TEMA */
+function mudarTema(t){
+    const dark = t==="escuro";
+    document.body.style.background = dark?"#121212":"#eef1f5";
+    document.body.style.color = dark?"#e0e0e0":"#000";
+
+    document.querySelectorAll(".box").forEach(b=>{
+        b.style.background = dark?"#1e1e1e":"#fff";
+        b.style.color = dark?"#e0e0e0":"#000";
+    });
+
+    document.querySelectorAll("button").forEach(btn=>{
+        btn.style.background = dark?"#333":"#003366";
+        btn.style.color="#fff";
+    });
+}
+
+window.onload=()=>carregar();
+</script>
+
+</body>
+</html>
